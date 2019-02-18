@@ -25,6 +25,18 @@
 #   unused-packages = true
 
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/armon/go-metrics"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "0.9.2"
+
+[[constraint]]
+  name = "github.com/spf13/pflag"
+  version = "1.0.3"
+
 [prune]
   go-tests = true
   unused-packages = true

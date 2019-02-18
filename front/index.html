@@ -5,8 +5,8 @@
     </head>
     <body>
         <canvas id="playArea"></canvas>
-        <script src="wasm_exec.js"></script>
 
+        <script src="wasm_exec.js"></script>
         <script>
         if (!WebAssembly.instantiateStreaming) { // polyfill
 			WebAssembly.instantiateStreaming = async (resp, importObject) => {
@@ -14,24 +14,12 @@
 				return await WebAssembly.instantiate(source, importObject);
 			};
 		}
-        const go = new Go();
-        let mod, inst;
-		WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then((result) => {
-			mod = result.module;
-            inst = result.instance;
-
-            go.run(inst);
-
-            const waitForReady = () => {
-                if (!gowasm && !gowasm.ready) {
-                    setTimeout(waitForReady, 1000);
-                    return;
-                }
-            }
-
-            setTimeout(waitForReady, 100);
-        }).catch((err) => {
-			console.error(err);
+		const go = new Go();
+		WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then(async (result) => {
+			let mod = result.module;
+			let inst = result.instance;
+			// run
+			await go.run(inst);
         });
         </script>
     </body>

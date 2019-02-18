@@ -20,7 +20,7 @@ bench:
 	go test -v -benchmem -bench . ./lib/...
 
 run-dev: lib/static/build.go
-	go run -race ./cmd/$(BINARY_NAME)/main.go -d -t 3
+	go run -race ./cmd/$(BINARY_NAME)/main.go -d
 
 docker: lib/static/build.go
 	docker build --rm -t evertras/fbr .
