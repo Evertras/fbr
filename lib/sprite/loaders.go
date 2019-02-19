@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/pkg/errors"
@@ -128,16 +129,48 @@ func StaticFromPath(path string) (Sprite, error) {
 
 // AnimatedFromPath loads an animated sprite with a given sprite sheet and animation data
 func AnimatedFromPath(pathSheet, pathFrames string, opts AnimationOptions) (Sprite, error) {
-	sheet, err := imageFromPath(pathSheet)
+	var sheet *ebiten.Image
+	var frames []image.Rectangle
 
-	if err != nil {
+	// We'll just take the first error and return that
+	errs := make(chan error, 1)
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+
+		var err error
+		sheet, err = imageFromPath(pathSheet)
+
+		if err != nil {
+			select {
+			case errs <- err:
+			default:
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		var err error
+		frames, err = framesFromPath(pathFrames)
+
+		if err != nil {
+			select {
+			case errs <- err:
+			default:
+			}
+		}
+	}()
+
+	wg.Wait()
+
+	select {
+	case err := <-errs:
 		return nil, err
-	}
-
-	frames, err := framesFromPath(pathFrames)
-
-	if err != nil {
-		return nil, err
+	default:
 	}
 
 	return NewAnimated(sheet, frames, opts), nil

@@ -19,7 +19,8 @@ type animated struct {
 
 // AnimationOptions can specify various options for animation of sprites
 type AnimationOptions struct {
-	FPS float64
+	FPS   float64
+	Loops bool
 }
 
 // NewAnimated creates an animated sprite that works via sprite sheets
