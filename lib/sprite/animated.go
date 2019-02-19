@@ -25,13 +25,15 @@ type AnimationOptions struct {
 // NewAnimated creates an animated sprite that works via sprite sheets
 func NewAnimated(sheet *ebiten.Image, frames []image.Rectangle, opts AnimationOptions) Sprite {
 	return &animated{
+		sheet:     sheet,
 		frames:    frames,
 		numFrames: float64(len(frames)),
+		opts:      opts,
 	}
 }
 
 func (a *animated) Draw(target *ebiten.Image, m ebiten.GeoM) {
-	target.DrawImage(target, &ebiten.DrawImageOptions{
+	target.DrawImage(a.sheet, &ebiten.DrawImageOptions{
 		GeoM: m,
 
 		// Note: This method is deprecated as of Ebiten 1.9 (unreleased as of typing this),
@@ -44,7 +46,7 @@ func (a *animated) Update(delta time.Duration) {
 	a.currentFrame += delta.Seconds() * a.opts.FPS
 
 	// Wrap around smoothly
-	for a.currentFrame > a.numFrames {
+	for a.currentFrame >= a.numFrames {
 		a.currentFrame -= a.numFrames
 	}
 }
