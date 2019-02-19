@@ -3,5 +3,8 @@ language: go
 go:
 - "1.11"
 
+services:
+- xvfb
+
 before_install:
-- sudo apt-get install xorg-dev xvfb
+- sudo apt-get install xorg-dev

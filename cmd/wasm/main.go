@@ -20,7 +20,8 @@ func loadImages() {
 	var err error
 
 	wizSprite, err = sprite.AnimatedFromPath("assets/wizard.png", "assets/wizard.idle.frames", sprite.AnimationOptions{
-		FPS: 10,
+		FPS:   10,
+		Loops: true,
 	})
 
 	if err != nil {
@@ -28,7 +29,8 @@ func loadImages() {
 	}
 
 	fireSprite, err = sprite.AnimatedFromPath("assets/fire.png", "assets/fire.frames", sprite.AnimationOptions{
-		FPS: 60,
+		FPS:   60,
+		Loops: true,
 	})
 
 	if err != nil {
