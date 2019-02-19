@@ -1,4 +1,4 @@
-BINARY_NAME=fbr
+BINARY_NAME=server
 
 all: test build
 
