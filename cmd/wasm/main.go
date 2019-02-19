@@ -55,9 +55,15 @@ func update(screen *ebiten.Image) error {
 
 	wizSprite.Draw(screen, viewMatrix)
 
-	viewMatrix.Translate(50, 0)
+	for x := 0; x < 50; x++ {
+		for y := 0; y < 50; y++ {
+			fireMatrix := ebiten.GeoM{}
 
-	fireSprite.Draw(screen, viewMatrix)
+			fireMatrix.Translate(float64(x*32), float64(y*32+32))
+
+			fireSprite.Draw(screen, fireMatrix)
+		}
+	}
 
 	ebitenutil.DebugPrint(
 		screen,

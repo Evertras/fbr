@@ -29,3 +29,8 @@ func (s *static) Draw(target *ebiten.Image, m ebiten.GeoM) {
 
 // Update is a no-op for a static sprite
 func (s *static) Update(_ time.Duration) {}
+
+// Complete is always false for static sprites
+func (s *static) Complete() bool {
+	return false
+}

@@ -13,6 +13,9 @@ type animated struct {
 	numFrames float64
 	opts      AnimationOptions
 
+	// For non-looping animations, set this when done
+	completed bool
+
 	// Round down to get the actual frame
 	currentFrame float64
 }
@@ -44,10 +47,23 @@ func (a *animated) Draw(target *ebiten.Image, m ebiten.GeoM) {
 }
 
 func (a *animated) Update(delta time.Duration) {
+	if a.completed {
+		return
+	}
+
 	a.currentFrame += delta.Seconds() * a.opts.FPS
 
-	// Wrap around smoothly
-	for a.currentFrame >= a.numFrames {
-		a.currentFrame -= a.numFrames
+	if a.opts.Loops {
+		// Wrap around smoothly
+		for a.currentFrame >= a.numFrames {
+			a.currentFrame -= a.numFrames
+		}
+	} else if a.currentFrame >= a.numFrames {
+		a.currentFrame = a.numFrames - 0.01
+		a.completed = true
 	}
+}
+
+func (a *animated) Complete() bool {
+	return a.completed
 }
