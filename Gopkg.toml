@@ -40,10 +40,6 @@
   name = "github.com/spf13/pflag"
   version = "1.0.3"
 
-[[override]]
-  branch = "master"
-  name = "github.com/go-gl/glfw"
-
 [prune]
   go-tests = true
   unused-packages = true

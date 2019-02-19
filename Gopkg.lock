@@ -33,7 +33,7 @@
   digest = "1:c8ff3b1978154f20401233de517bc2b3417a10e68d6e47685464679261aa75c2"
   name = "github.com/go-gl/glfw"
   packages = ["v3.2/glfw"]
-  pruneopts = ""
+  pruneopts = "T"
   revision = "93b30450e03279f638f2dba4f79488d7c6148ff8"
 
 [[projects]]

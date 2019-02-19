@@ -89,7 +89,7 @@ func main() {
 	lastFrame = time.Now()
 
 	// TODO: handle resize ratio changes
-	if err = ebiten.Run(update, w, h, 1.0, "海老天 - Fantasy Battle Royale"); err != nil {
+	if err = ebiten.Run(update, w, h, 1.0, "Fantasy Battle Royale (Powered by 海老天)"); err != nil {
 		panic(err)
 	}
 }
