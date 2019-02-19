@@ -26,7 +26,7 @@
 
 [[constraint]]
   name = "github.com/hajimehoshi/ebiten"
-  version = "1.8.3"
+  version = "~1.8.3"
 
 [[constraint]]
   branch = "master"
@@ -40,6 +40,15 @@
   name = "github.com/spf13/pflag"
   version = "1.0.3"
 
+[[override]]
+  branch = "master"
+  name = "github.com/go-gl/glfw"
+
 [prune]
   go-tests = true
   unused-packages = true
+
+  [[prune.project]]
+    # This contains some C code that we need
+    name = "github.com/go-gl/glfw"
+    unused-packages = false
