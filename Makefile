@@ -19,7 +19,7 @@ build-wasm:
 bench:
 	go test -v -benchmem -bench . ./lib/...
 
-run-dev: lib/static/build.go
+run-dev:
 	go run -race ./cmd/$(BINARY_NAME)/main.go -d
 
 docker: lib/static/build.go
@@ -29,7 +29,7 @@ docker: lib/static/build.go
 .PHONY: all clean test build build-wasm bench run-dev
 
 # Actual files/directories that must be generated
-lib/static/build.go: front/lib.wasm
+lib/static/build.go: front/lib.wasm front/index.html front/style.css front/wasm_exec.js
 	go generate ./lib/static/
 
 front/lib.wasm:

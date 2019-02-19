@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -40,27 +39,8 @@ func (s *Server) Listen(addr string) error {
 	// Note: the following is jank for prototype purposes, this should
 	// be an in-memory file system in a for-reals app... but this is easier
 	if s.cfg.ReadStaticFilesPerRequest {
+		mux.Handle("/", http.FileServer(http.Dir("front")))
 		log.Println("Reading files from disk for every request, ONLY USE THIS FOR DEV MODE!")
-
-		fileReaderFactory := func(f string, contentType string) func(w http.ResponseWriter, req *http.Request) {
-			return func(w http.ResponseWriter, req *http.Request) {
-				data, err := ioutil.ReadFile(f)
-
-				if err != nil {
-					log.Printf("Error reading %s: %v", f, err)
-					w.WriteHeader(500)
-					return
-				}
-
-				w.Header().Set("Content-Type", contentType)
-				w.Write(data)
-			}
-		}
-
-		mux.HandleFunc("/", fileReaderFactory("./front/index.html", "text/html"))
-		mux.HandleFunc("/wasm_exec.js", fileReaderFactory("./front/wasm_exec.js", "script/javascript"))
-		mux.HandleFunc("/style.css", fileReaderFactory("./front/style.css", "text/css"))
-		mux.HandleFunc("/lib.wasm", fileReaderFactory("./front/lib.wasm", "application/wasm"))
 	} else {
 		mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Content-Type", "text/html")

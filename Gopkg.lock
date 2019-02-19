@@ -21,12 +21,71 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  branch = "master"
+  digest = "1:0bc0ebdb4ebdd035644c9a86e3ec81e67261d87d5bb4aa0841d22443cf8a14a0"
+  name = "github.com/go-gl/gl"
+  packages = ["v2.1/gl"]
+  pruneopts = "UT"
+  revision = "55b76b7df9d25d70b63e31a767f47158292b85d8"
+
+[[projects]]
+  branch = "master"
+  digest = "1:a84997e52203446d4a7ebf6876923db94e40c178322d10666271345e2bc04e4f"
+  name = "github.com/go-gl/glfw"
+  packages = ["v3.2/glfw"]
+  pruneopts = "UT"
+  revision = "93b30450e03279f638f2dba4f79488d7c6148ff8"
+
+[[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f14d1b50e0075fb00177f12a96dd7addf93d1e2883c25befd17285b779549795"
+  name = "github.com/gopherjs/gopherjs"
+  packages = ["js"]
+  pruneopts = "UT"
+  revision = "d547d1d9531ed93dbdebcbff7f83e7c876a1e0ee"
+
+[[projects]]
+  digest = "1:94f6a77a051b8e2c6e8c280ce298dcd1028ed345f2209e630cdc606d59767f97"
+  name = "github.com/gopherjs/gopherwasm"
+  packages = ["js"]
+  pruneopts = "UT"
+  revision = "f5a54963d451109f20622db5b6a055569ec6b4c6"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:a3aba39145860416666065c4e7e818e0dec5298fddf29ca36b173613aa4b1f47"
+  name = "github.com/hajimehoshi/ebiten"
+  packages = [
+    ".",
+    "ebitenutil",
+    "ebitenutil/internal/assets",
+    "internal/affine",
+    "internal/clock",
+    "internal/devicescale",
+    "internal/graphics",
+    "internal/graphicsutil",
+    "internal/hooks",
+    "internal/input",
+    "internal/math",
+    "internal/opengl",
+    "internal/packing",
+    "internal/png",
+    "internal/restorable",
+    "internal/shareable",
+    "internal/ui",
+    "internal/web",
+  ]
+  pruneopts = "UT"
+  revision = "ded7a2d868207b7e324427bd5037460675b93229"
+  version = "v1.8.3"
 
 [[projects]]
   digest = "1:2be5a35f0c5b35162c41bb24971e5dcf6ce825403296ee435429cdcc4e1e847e"
@@ -105,12 +164,75 @@
   revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
   version = "v1.0.3"
 
+[[projects]]
+  branch = "master"
+  digest = "1:b3fb34441a9c22c9b6eb22bef0cc916f8ae72624b3a8dc15535ffb5bbba80b54"
+  name = "golang.org/x/exp"
+  packages = [
+    "shiny/driver/gldriver",
+    "shiny/driver/internal/drawer",
+    "shiny/driver/internal/errscreen",
+    "shiny/driver/internal/event",
+    "shiny/driver/internal/lifecycler",
+    "shiny/driver/internal/win32",
+    "shiny/driver/internal/x11key",
+    "shiny/screen",
+  ]
+  pruneopts = "UT"
+  revision = "21964bba6549f73cc16f1ddbc95bcbbb5b679985"
+
+[[projects]]
+  branch = "master"
+  digest = "1:b92d5f74778f4766055011db9abc4bba54edbe5e690a544e6dbfe4dd90824719"
+  name = "golang.org/x/image"
+  packages = ["math/f64"]
+  pruneopts = "UT"
+  revision = "ef4a1470e0dc5915f2f5fa04a28eeab72c6936a4"
+
+[[projects]]
+  branch = "master"
+  digest = "1:cbd8a6e88e0c6049fd91423ce632170c7cd454f07772cad4ab70c3966793c34c"
+  name = "golang.org/x/mobile"
+  packages = [
+    "app",
+    "app/internal/callfn",
+    "event/key",
+    "event/lifecycle",
+    "event/mouse",
+    "event/paint",
+    "event/size",
+    "event/touch",
+    "geom",
+    "gl",
+    "internal/mobileinit",
+  ]
+  pruneopts = "UT"
+  revision = "a42111704963f4f0d1266674e1e97489aa8dcca0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c4f2aacac0b737ab10dbb1ef6ecd371b22567de2166319357153af81ff0249a5"
+  name = "golang.org/x/sys"
+  packages = ["windows"]
+  pruneopts = "UT"
+  revision = "d0b11bdaac8adb652bff00e49bcacf992835621a"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1aae58d97a66dfc9cca57880841c2b274a570abf627b846e0b36c48d542e876c"
+  name = "golang.org/x/tools"
+  packages = ["go/ast/astutil"]
+  pruneopts = "UT"
+  revision = "8dcb7bc8c7fe0a895995c76c721cef79419ac98a"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/armon/go-metrics",
     "github.com/armon/go-metrics/prometheus",
+    "github.com/hajimehoshi/ebiten",
+    "github.com/hajimehoshi/ebiten/ebitenutil",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/spf13/pflag",
   ]
