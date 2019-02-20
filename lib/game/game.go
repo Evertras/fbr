@@ -12,8 +12,9 @@ import (
 type Instance struct {
 	world *ecs.World
 
-	componentSprite   ecs.ComponentType
-	componentPosition ecs.ComponentType
+	componentSprite     ecs.ComponentType
+	componentPosition   ecs.ComponentType
+	componentInputLocal ecs.ComponentType
 }
 
 // Step steps the game forward by the given delta
@@ -37,6 +38,7 @@ func NewClient() *Instance {
 	// Updates
 	i.world.RegisterSystem(systems.NewSpriteAnimations(i.componentSprite))
 	i.world.RegisterSystem(systems.NewSpriteReaper(i.componentSprite))
+	i.world.RegisterSystem(systems.NewInputLocal(i.componentInputLocal, i.componentPosition))
 
 	// Draws
 	i.world.RegisterSystemDraw(systems.NewSpriteDraw(i.componentSprite, i.componentPosition))
@@ -55,6 +57,9 @@ func (i *Instance) NumEntities() uint32 {
 }
 
 func (i *Instance) initComponentTypes() {
+	// Consider using init() to make components register themselves somehow,
+	// this could get nasty fast
 	i.componentSprite = i.world.NewComponent()
 	i.componentPosition = i.world.NewComponent()
+	i.componentInputLocal = i.world.NewComponent()
 }

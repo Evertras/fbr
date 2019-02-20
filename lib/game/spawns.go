@@ -67,6 +67,7 @@ func (i *Instance) SpawnPlayer(x, y float64) (ecs.EntityID, error) {
 
 	i.world.AddComponent(e, i.componentSprite, components.NewSpriteAnimated(sheet, frames, opts))
 	i.world.AddComponent(e, i.componentPosition, &components.Position{X: x, Y: y})
+	i.world.AddComponent(e, i.componentInputLocal, &components.InputLocal{Speed: 10})
 
 	return e, nil
 }

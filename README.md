@@ -12,5 +12,6 @@ Requires the following:
 
 * Go 1.11
 * GCC (MinGW is fine for Windows)
+* Make
 
 Run `make` to build after cloning.  The initial build or test may take some time due to OpenGL being compiled.
