@@ -36,6 +36,7 @@ func NewClient() *Instance {
 
 	// Updates
 	i.world.RegisterSystem(systems.NewSpriteAnimations(i.componentSprite))
+	i.world.RegisterSystem(systems.NewSpriteReaper(i.componentSprite))
 
 	// Draws
 	i.world.RegisterSystemDraw(systems.NewSpriteDraw(i.componentSprite, i.componentPosition))
@@ -46,6 +47,11 @@ func NewClient() *Instance {
 // NewServer creates a new Instance made for Servers
 func NewServer() *Instance {
 	panic("not implemented yet")
+}
+
+// NumEntities returns the current number of entities in the world
+func (i *Instance) NumEntities() uint32 {
+	return i.world.NumEntities()
 }
 
 func (i *Instance) initComponentTypes() {

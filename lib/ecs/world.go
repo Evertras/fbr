@@ -24,6 +24,8 @@ type World struct {
 
 	entityIDCounter      uint32
 	componentTypeCounter uint32
+
+	numEntities uint32
 }
 
 // NewWorld will create a blank World ready to be populated by entities, components, and systems
@@ -42,7 +44,14 @@ func (w *World) NewEntity() EntityID {
 
 	w.componentsByEntity[id] = make(map[ComponentType]Component)
 
+	atomic.AddUint32(&w.numEntities, 1)
+
 	return id
+}
+
+// NumEntities returns the current number of active entities in the world
+func (w *World) NumEntities() uint32 {
+	return w.numEntities
 }
 
 // MarkEntityDeleted marks the entity for a pending delete during the next cleanup
@@ -88,7 +97,12 @@ func (w *World) Step(delta time.Duration) {
 				}
 			}
 		}
+
+		delete(w.componentsByEntity, e)
+		w.numEntities--
 	}
+
+	w.pendingDelete = w.pendingDelete[:0]
 }
 
 // Draw draws the world to the given target
@@ -98,7 +112,7 @@ func (w *World) Draw(target *ebiten.Image) {
 	}
 }
 
-// AddComponent adds a component to a given entity
+// AddComponent adds a component to a given entity; this will override an existing component of the same type
 func (w *World) AddComponent(e EntityID, c ComponentType, data Component) {
 	data.SetOwner(e)
 	w.components[c] = append(w.components[c], data)
