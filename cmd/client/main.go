@@ -19,7 +19,7 @@ var lastFrame time.Time
 func loadImages() {
 	var err error
 
-	wizSprite, err = sprite.AnimatedFromPath("assets/wizard.png", "assets/wizard.idle.frames", sprite.AnimationOptions{
+	wizSprite, err = sprite.AnimatedFromPath("http://localhost:8000/assets/wizard.png", "http://localhost:8000/assets/wizard.idle.frames", sprite.AnimationOptions{
 		FPS:   10,
 		Loops: true,
 	})
@@ -28,7 +28,7 @@ func loadImages() {
 		panic(err)
 	}
 
-	fireSprite, err = sprite.AnimatedFromPath("assets/fire.png", "assets/fire.frames", sprite.AnimationOptions{
+	fireSprite, err = sprite.AnimatedFromPath("http://localhost:8000/assets/fire.png", "http://localhost:8000/assets/fire.frames", sprite.AnimationOptions{
 		FPS:   60,
 		Loops: true,
 	})

@@ -34,4 +34,4 @@ lib/static/build.go: front/lib.wasm front/index.html front/style.css front/wasm_
 	go generate ./lib/static/
 
 front/lib.wasm:
-	GOARCH=wasm GOOS=js go build -o front/lib.wasm cmd/wasm/main.go
+	GOARCH=wasm GOOS=js go build -o front/lib.wasm cmd/client/main.go
