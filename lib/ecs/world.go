@@ -1,7 +1,6 @@
 package ecs
 
 import (
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -18,10 +17,10 @@ type World struct {
 	componentsByEntity map[EntityID]map[ComponentType]Component
 	systems            []System
 
+	pendingDelete []EntityID
+
 	entityIDCounter      uint32
 	componentTypeCounter uint32
-
-	mu sync.RWMutex
 }
 
 // NewWorld will create a blank World ready to be populated by entities, components, and systems
@@ -37,20 +36,21 @@ func NewWorld() *World {
 func (w *World) NewEntity() EntityID {
 	id := EntityID(atomic.AddUint32(&w.entityIDCounter, 1))
 
-	w.mu.Lock()
 	w.componentsByEntity[id] = make(map[ComponentType]Component)
-	w.mu.Unlock()
 
 	return id
+}
+
+// MarkEntityDeleted marks the entity for a pending delete during the next cleanup
+func (w *World) MarkEntityDeleted(id EntityID) {
+	w.pendingDelete = append(w.pendingDelete, id)
 }
 
 // NewComponent generates a new ComponentType for reference later
 func (w *World) NewComponent() ComponentType {
 	id := ComponentType(atomic.AddUint32(&w.componentTypeCounter, 1))
 
-	w.mu.Lock()
-	w.components[id] = make([]Component, 0)
-	w.mu.Unlock()
+	w.components[id] = make([]Component, 10000)[:0]
 
 	return id
 }
@@ -66,29 +66,37 @@ func (w *World) Step(delta time.Duration) {
 	for _, s := range w.systems {
 		s.ActOn(w, delta)
 	}
+
+	// This is bad, optimize later
+	for _, e := range w.pendingDelete {
+		for cType := range w.componentsByEntity[e] {
+			for i, c := range w.components[cType] {
+				if c.GetOwner() == e {
+					w.components[cType][i] = w.components[cType][len(w.components[cType])-1]
+					w.components[cType] = w.components[cType][:len(w.components[cType])-1]
+					break
+				}
+			}
+		}
+	}
 }
 
 // AddComponent adds a component to a given entity
 func (w *World) AddComponent(e EntityID, c ComponentType, data Component) {
-	w.mu.Lock()
 	data.SetOwner(e)
 	w.components[c] = append(w.components[c], data)
 	w.componentsByEntity[e][c] = data
-	w.mu.Unlock()
 }
 
 // GetComponent gets the component data for an entity
 func (w *World) GetComponent(e EntityID, c ComponentType) (data Component, found bool) {
-	w.mu.RLock()
 	entity, ok := w.componentsByEntity[e]
 	if !ok {
 		found = false
-		w.mu.RUnlock()
 		return
 	}
 
 	data, found = entity[c]
-	w.mu.RUnlock()
 
 	return
 }

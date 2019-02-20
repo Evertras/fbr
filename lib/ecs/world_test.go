@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -106,5 +107,123 @@ func TestSimplestPossibleWorks(t *testing.T) {
 
 	if updated.T != time.Second {
 		t.Fatalf("Expected to have duration of %v, but got %v", time.Second, updated.T)
+	}
+}
+
+func TestDeleteEntity(t *testing.T) {
+	w := NewWorld()
+
+	e1 := w.NewEntity()
+	e2 := w.NewEntity()
+	c := w.NewComponent()
+
+	w.AddComponent(e1, c, &SampleComponent{})
+	w.AddComponent(e2, c, &SampleComponent{})
+
+	// Quick sanity check
+	if len(w.GetComponents(c)) != 2 {
+		t.Fatal("Did not actually add the component in the first place")
+	}
+
+	w.MarkEntityDeleted(e1)
+
+	// Shouldn't be deleted yet
+	if len(w.GetComponents(c)) != 2 {
+		t.Fatal("Incorrectly deleted entity, which could cause nasty race conditions")
+	}
+
+	// Do a full step, even with no systems
+	w.Step(time.Second)
+
+	// Now it should be gone
+	after := w.GetComponents(c)
+	if len(after) != 1 {
+		t.Fatalf("Expected to have 1 entity but got %d", len(after))
+	}
+
+	// The only remaining ID should be e2's
+	if after[0].GetOwner() != e2 {
+		t.Fatal("Deleted the wrong entity!")
+	}
+}
+
+func Benchmark10kEntitiesSingleSimpleSystem(b *testing.B) {
+	w := NewWorld()
+
+	numEntities := 10000
+
+	c := w.NewComponent()
+
+	for i := 0; i < numEntities; i++ {
+		e := w.NewEntity()
+
+		w.AddComponent(e, c, &SampleComponent{})
+	}
+
+	w.RegisterSystem(NewSampleSystem(c))
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		w.Step(time.Nanosecond)
+	}
+}
+
+func BenchmarkCreateAndDeleteSingleEntity(b *testing.B) {
+	benchmarks := []struct {
+		NumEntities   int
+		NumComponents int
+	}{
+		{
+			NumEntities:   10,
+			NumComponents: 1,
+		},
+		{
+			NumEntities:   1,
+			NumComponents: 10,
+		},
+		{
+			NumEntities:   100,
+			NumComponents: 10,
+		},
+		{
+			NumEntities:   10,
+			NumComponents: 100,
+		},
+	}
+
+	for _, benchmark := range benchmarks {
+		b.Run(fmt.Sprintf("%d entities %d components", benchmark.NumEntities, benchmark.NumComponents), func(b *testing.B) {
+			w := NewWorld()
+
+			components := make([]ComponentType, benchmark.NumComponents)
+
+			for i := 0; i < benchmark.NumComponents; i++ {
+				components[i] = w.NewComponent()
+			}
+
+			for i := 0; i < benchmark.NumEntities; i++ {
+				e := w.NewEntity()
+
+				for j := 0; j < benchmark.NumComponents; j++ {
+					w.AddComponent(e, components[j], &SampleComponent{})
+				}
+			}
+
+			fakeData := &SampleComponent{}
+
+			b.ResetTimer()
+
+			for i := 0; i < b.N; i++ {
+				e := w.NewEntity()
+
+				for j := 0; j < benchmark.NumComponents; j++ {
+					w.AddComponent(e, components[j], fakeData)
+				}
+
+				w.MarkEntityDeleted(e)
+				w.Step(time.Nanosecond)
+			}
+		})
 	}
 }
