@@ -1,4 +1,4 @@
-package sprite
+package asset
 
 import (
 	"image"

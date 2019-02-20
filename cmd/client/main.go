@@ -6,66 +6,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Evertras/fbr/lib/sprite"
+	"github.com/Evertras/fbr/lib/game"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
-var wizSprite sprite.Sprite
-var fireSprite sprite.Sprite
 var lastFrame time.Time
-
-// Temporary sandbox
-func loadImages() {
-	var err error
-
-	wizSprite, err = sprite.AnimatedFromPath("http://localhost:8000/assets/wizard.png", "http://localhost:8000/assets/wizard.idle.frames", sprite.AnimationOptions{
-		FPS:   10,
-		Loops: true,
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	fireSprite, err = sprite.AnimatedFromPath("http://localhost:8000/assets/fire.png", "http://localhost:8000/assets/fire.frames", sprite.AnimationOptions{
-		FPS:   60,
-		Loops: true,
-	})
-
-	if err != nil {
-		panic(err)
-	}
-}
+var instance *game.Instance
 
 func update(screen *ebiten.Image) error {
 	now := time.Now()
 	defer func() { lastFrame = now }()
 
 	delta := now.Sub(lastFrame)
-	wizSprite.Update(delta)
-	fireSprite.Update(delta)
+
+	instance.Step(delta)
 
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
 
-	viewMatrix := ebiten.GeoM{}
-
-	viewMatrix.Translate(50, 50)
-	//viewMatrix.Invert()
-
-	wizSprite.Draw(screen, viewMatrix)
-
-	for x := 0; x < 50; x++ {
-		for y := 0; y < 50; y++ {
-			fireMatrix := ebiten.GeoM{}
-
-			fireMatrix.Translate(float64(x*32), float64(y*32+32))
-
-			fireSprite.Draw(screen, fireMatrix)
-		}
-	}
+	instance.Draw(screen)
 
 	ebitenutil.DebugPrint(
 		screen,
@@ -80,7 +41,11 @@ func update(screen *ebiten.Image) error {
 func main() {
 	var err error
 
-	loadImages()
+	instance = game.NewClient()
+
+	// <sandbox>
+	instance.SpawnFire(50, 50)
+	// </sandbox
 
 	w, h := ebiten.ScreenSizeInFullscreen()
 

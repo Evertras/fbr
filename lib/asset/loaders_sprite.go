@@ -1,4 +1,4 @@
-package sprite
+package asset
 
 import (
 	"image"
@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/pkg/errors"
 )
+
+var imageCache = make(map[string]*ebiten.Image)
+var frameCache = make(map[string][]image.Rectangle)
 
 func readerFromPath(path string) (io.ReadCloser, error) {
 	// TODO: This could be a file system or something else based on build
@@ -27,20 +29,6 @@ func readerFromPath(path string) (io.ReadCloser, error) {
 	}
 
 	return resp.Body, nil
-}
-
-func imageFromPath(path string) (*ebiten.Image, error) {
-	reader, err := readerFromPath(path)
-
-	if err != nil {
-		return nil, err
-	}
-
-	raw, _, err := image.Decode(reader)
-
-	reader.Close()
-
-	return ebiten.NewImageFromImage(raw, ebiten.FilterDefault)
 }
 
 func framesFromReader(reader io.Reader) ([]image.Rectangle, error) {
@@ -102,7 +90,41 @@ func framesFromReader(reader io.Reader) ([]image.Rectangle, error) {
 	return rects, nil
 }
 
-func framesFromPath(path string) ([]image.Rectangle, error) {
+// LoadImageFromPath loads a static sprite from the given relative path, caching results for future calls
+func LoadImageFromPath(path string) (*ebiten.Image, error) {
+	if img, ok := imageCache[path]; ok {
+		return img, nil
+	}
+
+	reader, err := readerFromPath(path)
+
+	if err != nil {
+		return nil, err
+	}
+
+	raw, _, err := image.Decode(reader)
+
+	reader.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	img, err := ebiten.NewImageFromImage(raw, ebiten.FilterDefault)
+
+	if err == nil {
+		imageCache[path] = img
+	}
+
+	return img, err
+}
+
+// LoadFramesFromPath loads frame data from the given path, caching results for future calls
+func LoadFramesFromPath(path string) ([]image.Rectangle, error) {
+	if frames, ok := frameCache[path]; ok {
+		return frames, nil
+	}
+
 	reader, err := readerFromPath(path)
 
 	if err != nil {
@@ -113,65 +135,9 @@ func framesFromPath(path string) ([]image.Rectangle, error) {
 
 	reader.Close()
 
+	if err == nil {
+		frameCache[path] = frames
+	}
+
 	return frames, err
-}
-
-// StaticFromPath loads a static sprite from the given relative path
-func StaticFromPath(path string) (Sprite, error) {
-	img, err := imageFromPath(path)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return NewStatic(img), nil
-}
-
-// AnimatedFromPath loads an animated sprite with a given sprite sheet and animation data
-func AnimatedFromPath(pathSheet, pathFrames string, opts AnimationOptions) (Sprite, error) {
-	var sheet *ebiten.Image
-	var frames []image.Rectangle
-
-	// We'll just take the first error and return that
-	errs := make(chan error, 1)
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-
-		var err error
-		sheet, err = imageFromPath(pathSheet)
-
-		if err != nil {
-			select {
-			case errs <- err:
-			default:
-			}
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		var err error
-		frames, err = framesFromPath(pathFrames)
-
-		if err != nil {
-			select {
-			case errs <- err:
-			default:
-			}
-		}
-	}()
-
-	wg.Wait()
-
-	select {
-	case err := <-errs:
-		return nil, err
-	default:
-	}
-
-	return NewAnimated(sheet, frames, opts), nil
 }
