@@ -14,8 +14,8 @@ type ComponentType uint32
 
 // World represents a world filled with Entities/Components that can be acted on by Systems
 type World struct {
-	components         map[ComponentType][]interface{}
-	componentsByEntity map[EntityID]map[ComponentType]interface{}
+	components         map[ComponentType][]Component
+	componentsByEntity map[EntityID]map[ComponentType]Component
 	systems            []System
 
 	entityIDCounter      uint32
@@ -27,8 +27,8 @@ type World struct {
 // NewWorld will create a blank World ready to be populated by entities, components, and systems
 func NewWorld() *World {
 	return &World{
-		components:         make(map[ComponentType][]interface{}),
-		componentsByEntity: make(map[EntityID]map[ComponentType]interface{}),
+		components:         make(map[ComponentType][]Component),
+		componentsByEntity: make(map[EntityID]map[ComponentType]Component),
 		systems:            make([]System, 0),
 	}
 }
@@ -38,7 +38,7 @@ func (w *World) NewEntity() EntityID {
 	id := EntityID(atomic.AddUint32(&w.entityIDCounter, 1))
 
 	w.mu.Lock()
-	w.componentsByEntity[id] = make(map[ComponentType]interface{})
+	w.componentsByEntity[id] = make(map[ComponentType]Component)
 	w.mu.Unlock()
 
 	return id
@@ -49,7 +49,7 @@ func (w *World) NewComponent() ComponentType {
 	id := ComponentType(atomic.AddUint32(&w.componentTypeCounter, 1))
 
 	w.mu.Lock()
-	w.components[id] = make([]interface{}, 0)
+	w.components[id] = make([]Component, 0)
 	w.mu.Unlock()
 
 	return id
@@ -69,18 +69,31 @@ func (w *World) Step(delta time.Duration) {
 }
 
 // AddComponent adds a component to a given entity
-func (w *World) AddComponent(e EntityID, c ComponentType, data interface{}) {
+func (w *World) AddComponent(e EntityID, c ComponentType, data Component) {
 	w.mu.Lock()
+	data.SetOwner(e)
+	w.components[c] = append(w.components[c], data)
+	w.componentsByEntity[e][c] = data
 	w.mu.Unlock()
 }
 
 // GetComponent gets the component data for an entity
-func (w *World) GetComponent(e EntityID, c ComponentType) (data interface{}, found bool) {
+func (w *World) GetComponent(e EntityID, c ComponentType) (data Component, found bool) {
 	w.mu.RLock()
-	data = nil
+	entity, ok := w.componentsByEntity[e]
+	if !ok {
+		found = false
+		w.mu.RUnlock()
+		return
+	}
+
+	data, found = entity[c]
 	w.mu.RUnlock()
 
-	found = false
-
 	return
+}
+
+// GetComponents gets all components of a given type
+func (w *World) GetComponents(c ComponentType) []Component {
+	return w.components[c]
 }

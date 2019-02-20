@@ -25,15 +25,74 @@ func TestCreatedEntitiesHaveUniqueIDs(t *testing.T) {
 	}
 }
 
+func TestGetComponentsCorrectlyReturnsMissing(t *testing.T) {
+	w := NewWorld()
+
+	e := w.NewEntity()
+	c := w.NewComponent()
+
+	_, ok := w.GetComponent(e, c)
+
+	if ok {
+		t.Fatal("Got some unexpected data back")
+	}
+}
+
+func TestGetComponent(t *testing.T) {
+	w := NewWorld()
+
+	e := w.NewEntity()
+	c := w.NewComponent()
+
+	w.AddComponent(e, c, &SampleComponent{
+		T: time.Second,
+	})
+
+	raw, ok := w.GetComponent(e, c)
+
+	if !ok {
+		t.Fatal("Did not get component back")
+	}
+
+	data := raw.(*SampleComponent)
+
+	// Quick sanity check to make sure it's the same thing
+	if data.T != time.Second {
+		t.Fatalf("Expected T to be %v, but was %v", time.Second, data.T)
+	}
+}
+
+func TestGetComponents(t *testing.T) {
+	w := NewWorld()
+
+	numEntities := 10
+
+	c := w.NewComponent()
+
+	for i := 0; i < numEntities; i++ {
+		e := w.NewEntity()
+
+		w.AddComponent(e, c, &SampleComponent{
+			T: time.Second,
+		})
+	}
+
+	components := w.GetComponents(c)
+
+	if len(components) != numEntities {
+		t.Fatalf("Expected %d components, but got %d", numEntities, len(components))
+	}
+}
+
 func TestSimplestPossibleWorks(t *testing.T) {
 	w := NewWorld()
 
 	e := w.NewEntity()
 	c := w.NewComponent()
 
-	w.RegisterSystem(&SampleSystem{})
+	w.RegisterSystem(NewSampleSystem(c))
 
-	w.AddComponent(e, c, &SampleComponent{0, 0, 0})
+	w.AddComponent(e, c, &SampleComponent{})
 
 	w.Step(time.Second)
 
@@ -46,6 +105,6 @@ func TestSimplestPossibleWorks(t *testing.T) {
 	updated := raw.(*SampleComponent)
 
 	if updated.T != time.Second {
-		t.Fatalf("Expected to have duration of 1 second, but got %v", updated.T)
+		t.Fatalf("Expected to have duration of %v, but got %v", time.Second, updated.T)
 	}
 }
