@@ -16,13 +16,13 @@ func (i *Instance) SpawnFire(x, y float64) (ecs.EntityID, error) {
 		Y: y,
 	})
 
-	fireSheet, err := asset.LoadImageFromPath("http://localhost:8000/assets/fire.png")
+	fireSheet, err := asset.LoadImageFromPath("assets/fire.png")
 
 	if err != nil {
 		return 0, errors.Wrap(err, "could not load fire sprite sheet")
 	}
 
-	fireFrames, err := asset.LoadFramesFromPath("http://localhost:8000/assets/fire.frames")
+	fireFrames, err := asset.LoadFramesFromPath("assets/fire.frames")
 
 	if err != nil {
 		return 0, errors.Wrap(err, "could not load fire frames")

@@ -15,7 +15,7 @@ build: lib/static/build.go
 	CGO_ENABLED=0 go build -o $(BINARY_NAME) -v ./cmd/$(BINARY_NAME)/main.go
 
 build-wasm: 
-	CGO_ENABLED=0 GOARCH=wasm GOOS=js go build -o front/lib.wasm cmd/wasm/main.go
+	CGO_ENABLED=0 GOARCH=wasm GOOS=js go build -o front/lib.wasm cmd/client/main.go
 
 bench:
 	go test -v -benchmem -run 'xxx' -bench . ./lib/...

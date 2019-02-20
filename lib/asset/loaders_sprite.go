@@ -4,7 +4,6 @@ import (
 	"image"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"strconv"
 	"strings"
 
@@ -14,22 +13,6 @@ import (
 
 var imageCache = make(map[string]*ebiten.Image)
 var frameCache = make(map[string][]image.Rectangle)
-
-func readerFromPath(path string) (io.ReadCloser, error) {
-	// TODO: This could be a file system or something else based on build
-	// environment (mobile!), but for now it's just an HTTP request
-	resp, err := http.Get(path)
-
-	if err != nil {
-		return nil, errors.Wrap(err, path)
-	}
-
-	if resp.StatusCode/100 != 2 {
-		return nil, errors.Errorf("Could not load path %q: Status code %d", path, resp.StatusCode)
-	}
-
-	return resp.Body, nil
-}
 
 func framesFromReader(reader io.Reader) ([]image.Rectangle, error) {
 	raw, err := ioutil.ReadAll(reader)
