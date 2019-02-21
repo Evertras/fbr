@@ -5,6 +5,7 @@ import (
 
 	"github.com/Evertras/fbr/lib/ecs"
 	"github.com/Evertras/fbr/lib/game/systems"
+	"github.com/Evertras/fbr/lib/render"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -15,6 +16,8 @@ type Instance struct {
 	componentSprite     ecs.ComponentType
 	componentPosition   ecs.ComponentType
 	componentInputLocal ecs.ComponentType
+
+	layerObjects *render.Layer
 }
 
 // Step steps the game forward by the given delta
@@ -24,7 +27,7 @@ func (i *Instance) Step(delta time.Duration) {
 
 // Draw draws the world to the given target
 func (i *Instance) Draw(target *ebiten.Image) {
-	i.world.Draw(target)
+	i.layerObjects.Draw(target)
 }
 
 // NewClient creates a new Instance made for Clients
@@ -32,6 +35,8 @@ func NewClient() *Instance {
 	i := &Instance{}
 
 	i.world = ecs.NewWorld()
+
+	i.layerObjects = render.NewLayer()
 
 	i.initComponentTypes()
 
@@ -41,7 +46,7 @@ func NewClient() *Instance {
 	i.world.RegisterSystem(systems.NewInputLocal(i.componentInputLocal, i.componentPosition))
 
 	// Draws
-	i.world.RegisterSystemDraw(systems.NewSpriteDraw(i.componentSprite, i.componentPosition))
+	i.world.RegisterSystem(systems.NewSpriteDraw(i.componentSprite, i.componentPosition))
 
 	return i
 }

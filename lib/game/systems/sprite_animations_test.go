@@ -24,7 +24,7 @@ func TestSpriteAnimatedLoops(t *testing.T) {
 		Loops: true,
 	}
 
-	sprite := components.NewSpriteAnimated(nil, frames, opts)
+	sprite := components.NewSpriteAnimated(nil, frames, opts, nil)
 
 	if sprite.CurrentFrame != 0 {
 		t.Fatal("Expected to start at frame 0")
@@ -70,7 +70,7 @@ func TestSpriteAnimatedComplets(t *testing.T) {
 		Loops: false,
 	}
 
-	sprite := components.NewSpriteAnimated(nil, frames, opts)
+	sprite := components.NewSpriteAnimated(nil, frames, opts, nil)
 
 	if sprite.CurrentFrame != 0 {
 		t.Fatal("Expected to start at frame 0")

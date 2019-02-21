@@ -38,6 +38,7 @@ func (i *Instance) SpawnFire(x, y float64) (ecs.EntityID, error) {
 				FPS:   60,
 				Loops: false,
 			},
+			i.layerObjects,
 		),
 	)
 
@@ -65,7 +66,7 @@ func (i *Instance) SpawnPlayer(x, y float64) (ecs.EntityID, error) {
 		Loops: true,
 	}
 
-	i.world.AddComponent(e, i.componentSprite, components.NewSpriteAnimated(sheet, frames, opts))
+	i.world.AddComponent(e, i.componentSprite, components.NewSpriteAnimated(sheet, frames, opts, i.layerObjects))
 	i.world.AddComponent(e, i.componentPosition, &components.Position{X: x, Y: y})
 	i.world.AddComponent(e, i.componentInputLocal, &components.InputLocal{Speed: 10})
 

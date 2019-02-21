@@ -3,8 +3,6 @@ package ecs
 import (
 	"sync/atomic"
 	"time"
-
-	"github.com/hajimehoshi/ebiten"
 )
 
 // EntityID identifies a unique Entity in the World
@@ -18,7 +16,6 @@ type World struct {
 	components         map[ComponentType][]Component
 	componentsByEntity map[EntityID]map[ComponentType]Component
 	systems            []System
-	systemsDraw        []SystemDraw
 
 	pendingDelete []EntityID
 
@@ -34,7 +31,6 @@ func NewWorld() *World {
 		components:         make(map[ComponentType][]Component),
 		componentsByEntity: make(map[EntityID]map[ComponentType]Component),
 		systems:            make([]System, 0),
-		systemsDraw:        make([]SystemDraw, 0),
 	}
 }
 
@@ -74,12 +70,6 @@ func (w *World) RegisterSystem(s System) {
 	w.systems = append(w.systems, s)
 }
 
-// RegisterSystemDraw adds the given drawing system to the world.
-// Systems are run in the same order they're registered.
-func (w *World) RegisterSystemDraw(s SystemDraw) {
-	w.systemsDraw = append(w.systemsDraw, s)
-}
-
 // Step moves the world forward by the given time step
 func (w *World) Step(delta time.Duration) {
 	for _, s := range w.systems {
@@ -103,13 +93,6 @@ func (w *World) Step(delta time.Duration) {
 	}
 
 	w.pendingDelete = w.pendingDelete[:0]
-}
-
-// Draw draws the world to the given target
-func (w *World) Draw(target *ebiten.Image) {
-	for _, s := range w.systemsDraw {
-		s.Draw(w, target)
-	}
 }
 
 // AddComponent adds a component to a given entity; this will override an existing component of the same type

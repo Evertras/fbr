@@ -4,6 +4,7 @@ import (
 	"image"
 
 	"github.com/Evertras/fbr/lib/ecs"
+	"github.com/Evertras/fbr/lib/render"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -27,16 +28,24 @@ type Sprite struct {
 
 	// Round down to get the actual frame
 	CurrentFrame float64
+
+	RenderLayer *render.Layer
 }
 
 // NewSpriteAnimated creates an animated sprite that works via sprite sheets
-func NewSpriteAnimated(sheet *ebiten.Image, frames []image.Rectangle, opts SpriteAnimationOptions) *Sprite {
+func NewSpriteAnimated(
+	sheet *ebiten.Image,
+	frames []image.Rectangle,
+	opts SpriteAnimationOptions,
+	renderLayer *render.Layer,
+) *Sprite {
 	return &Sprite{
-		Sheet:     sheet,
-		Frames:    frames,
-		NumFrames: float64(len(frames)),
-		Opts:      opts,
-		Completed: false,
+		Sheet:       sheet,
+		Frames:      frames,
+		NumFrames:   float64(len(frames)),
+		Opts:        opts,
+		Completed:   false,
+		RenderLayer: renderLayer,
 	}
 }
 
