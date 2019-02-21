@@ -86,7 +86,7 @@ func (w *World) Step(delta time.Duration) {
 		s.ActOn(w, delta)
 	}
 
-	// This is bad, optimize later
+	// This is bad, optimize later if it turns ou to be demonstrably slow
 	for _, e := range w.pendingDelete {
 		for cType := range w.componentsByEntity[e] {
 			for i, c := range w.components[cType] {
